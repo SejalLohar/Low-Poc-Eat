@@ -1,0 +1,222 @@
+
+<!DOCTYPE html> 
+<html lang="en"> 
+<head> 
+  <meta charset="UTF-8"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+  <title>Sign Up Page</title> 
+  <style> 
+    /* Styles for the page (same as before) */ 
+    *{
+      font-family: 'time new roman', serif;
+    }
+    .container { 
+      width: 100%; 
+      height: 100vh; 
+      display: flex; 
+      flex-direction: column; 
+      justify-content: center; 
+      align-items: center; 
+      background: #FFF1DB; 
+      padding: 20px; 
+      
+    } 
+ 
+    .sign-up-title { 
+      text-align: center;
+      font-size: 36px; 
+      font-weight: 600; 
+      color: black; 
+      margin-bottom: 40px; 
+    } 
+ 
+    .form-container { 
+      width: 100%; 
+      max-width: 500px; 
+      background: #D4BDAC; 
+      padding: 30px; 
+      border-radius: 8px; 
+      box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.5); 
+    } 
+ 
+    .input-field { 
+      width: 100%; 
+      padding: 15px; 
+      margin: 10px 0; 
+      background-color: #D9D9D9; 
+      border: 1px solid #ccc; 
+      border-radius: 8px; 
+      font-size: 16px; 
+      box-sizing: border-box; 
+    } 
+ 
+    .input-label { 
+      font-size: 18px; 
+      font-family: 'Inter', sans-serif; 
+      font-weight: 500; 
+      color: black; 
+      margin-bottom: 8px; 
+    } 
+ 
+    .sign-up-button { 
+      width: 100%; 
+      padding: 16px; 
+      background: black; 
+      color: white; 
+      font-size: 18px; 
+      font-family: 'Inter', sans-serif; 
+      font-weight: 500; 
+      text-align: center; 
+      border: none; 
+      border-radius: 8px; 
+      cursor: pointer; 
+      margin-top: 20px; 
+    } 
+ 
+    .sign-up-button:hover { 
+      background: #333; 
+    } 
+ 
+    .already-account { 
+      font-size: 16px; 
+      font-family: 'Inter', sans-serif; 
+      font-weight: 500; 
+      color: black; 
+      text-align: center; 
+      margin-top: 15px; 
+    } 
+ 
+    .already-account a { 
+      text-decoration: none; 
+      color: black; 
+    } 
+ 
+    .already-account a:hover { 
+      text-decoration: underline; 
+    } 
+ 
+    .signin-button { 
+      width: 100%; 
+      padding: 16px; 
+      background: #E6E6E6; 
+      color: black; 
+      font-size: 18px; 
+      font-family: 'Inter', sans-serif; 
+      font-weight: 500; 
+      text-align: center; 
+      border: none; 
+      border-radius: 8px; 
+      cursor: pointer; 
+      margin-top: 10px; 
+    } 
+ 
+    .signin-button:hover { 
+      background: #ccc; 
+    } 
+ 
+    .messages { 
+      width: 100%; 
+      margin-bottom: 20px; 
+      text-align: center; 
+    } 
+ 
+    .message { 
+      padding: 10px; 
+      border-radius: 5px; 
+      margin-bottom: 10px; 
+      font-size: 16px; 
+    } 
+ 
+    .error { 
+      background-color: #f8d7da; 
+      color: #721c24; 
+    } 
+ 
+    .success { 
+      background-color: #d4edda; 
+      color: #155724; 
+    } 
+  </style> 
+</head> 
+<body> 
+  <div class="container"> 
+    <!-- Sign up title --> 
+    
+ 
+    <!-- Displaying messages (error/success) --> 
+    {% if messages %} 
+      <div class="messages"> 
+        {% for message in messages %} 
+          <div class="message {{ message.tags }}"> 
+            {{ message }} 
+          </div> 
+        {% endfor %} 
+      </div> 
+    {% endif %} 
+ 
+    <!-- Form Container --> 
+    <div class="form-container"> 
+      <div class="sign-up-title">Sign Up</div> 
+      <form method="post" onsubmit="return validateForm()"> 
+        {% csrf_token %} 
+ 
+        <!-- Username --> 
+        <label for="username" class="input-label">Username:</label> 
+        <input type="text" name="username" id="username" class="input-field" placeholder="Enter your username" required> 
+ 
+        <!-- Email --> 
+        <label for="email" class="input-label">Email:</label> 
+        <input type="email" name="email" id="email" class="input-field" placeholder="Enter your email" required> 
+ 
+        <!-- Password --> 
+        <label for="password1" class="input-label">Password:</label> 
+        <input type="password" name="password1" id="password1" class="input-field" placeholder="Enter your password" required> 
+ 
+        <!-- Reconfirm Password --> 
+        <label for="password2" class="input-label">Reconfirm Password:</label> 
+        <input type="password" name="password2" id="password2" class="input-field" placeholder="Reconfirm your password" required> 
+ 
+        <!-- Sign up Button --> 
+        <button type="submit" class="sign-up-button">Sign Up</button> 
+      </form> 
+ 
+      <!-- Already have an account? --> 
+      <div class="already-account"> 
+        Already have an account? <a href="{% url 'login' %}">Log In</a> 
+      </div> 
+ 
+      <!-- Sign In Button --> 
+      <button class="signin-button" onclick="window.location.href='{% url 'login' %}'">Already have an account? Log in</button> 
+    </div> 
+  </div> 
+ 
+  <script> 
+    //Client-side validation function
+    function validateForm() { 
+      // Get values from input fields 
+      var password1 = document.getElementById('password1').value; 
+      var password2 = document.getElementById('password2').value; 
+      var username = document.getElementById('username').value; 
+      var email = document.getElementById('email').value; 
+ 
+      // Check if passwords match 
+      if (password1 !== password2) { 
+        alert("Passwords do not match."); 
+        return false; 
+      } 
+ 
+      // Check if username is valid (optional check for length or characters) 
+      if (username.length < 5 || username.length > 150) { 
+        alert("Username must be between 5 and 150 characters."); 
+        return false; 
+      } 
+ 
+      // Email format is already handled by type="email" attribute 
+      // You can add more checks if necessary, e.g., for email uniqueness 
+ 
+      // If everything is valid, return true to submit the form 
+      return true; 
+    } 
+  </script> 
+</body> 
+</html>

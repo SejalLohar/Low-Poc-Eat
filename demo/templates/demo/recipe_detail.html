@@ -1,0 +1,123 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recipe Detail</title>
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #fafafa;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 30px;
+      background-color: #ffffff;
+      box-sizing: border-box;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+      border-radius: 12px;
+      margin-top: 40px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .header h1 {
+      font-size: 36px;
+      font-weight: 700;
+      color: #123B57;
+      text-transform: uppercase;
+    }
+
+    .recipe-details {
+      margin-bottom: 20px;
+    }
+
+    .recipe-details h2 {
+      font-size: 28px;
+      font-weight: 600;
+      color: #123B57;
+    }
+
+    .recipe-details p {
+      font-size: 18px;
+      color: #555;
+    }
+
+    .ingredients, .instructions, .nutrition {
+      margin-bottom: 20px;
+    }
+
+    .ingredients h3, .instructions h3, .nutrition h3 {
+      font-size: 24px;
+      font-weight: 600;
+      color: #123B57;
+    }
+
+    .ingredients ul, .instructions ul, .nutrition ul {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    .ingredients li, .instructions li, .nutrition li {
+      font-size: 18px;
+      color: #555;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>{{ recipe.name }}</h1>
+  </div>
+
+  <div class="recipe-details">
+    <h2>Ingredients:</h2>
+    <p>{{ recipe.ingredients }}</p>
+  </div>
+
+  <div class="recipe-details">
+    <h2>Instructions:</h2>
+    <p>{{ recipe.instructions }}</p>
+  </div>
+
+  <div class="recipe-details">
+    <h2>Cost:</h2>
+    <p>{{ recipe.total_cost }}</p>
+  </div>
+
+  <div class="recipe-details">
+    <h2>Nutrition (per serving):</h2>
+    <ul>
+      <li>Calories: {{ recipe.calories }}</li>
+      <li>Fat: {{ recipe.fat }}</li>
+      <li>Protein: {{ recipe.protein }}</li>
+      <li>Carbohydrates: {{ recipe.carbohydrates }}</li>
+      <li>Vitamin C: {{ recipe.vitamin_c }}</li>
+    </ul>
+  </div>
+
+  <div class="recipe-details">
+    <h2>Suitable Health Conditions:</h2>
+    <ul>
+      {% for condition in associated_health_conditions %}
+        <li>{{ condition.name }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+</body>
+</html>

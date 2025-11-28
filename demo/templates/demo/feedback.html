@@ -1,0 +1,246 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feedback</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <style>
+        body {
+            font-family: 'time new roman', serif;
+            background-color: #FFF1DB;
+            margin: 0;
+            padding: 0;
+            color: black;
+        }
+
+        .container {
+            width: 50%;
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 30px;
+            background: #D4BDAC;
+            border-radius: 12px;
+            box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .feedback-title {
+            font-size: 32px;
+            font-weight: 600;
+            color: #123B57;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        /* FAQ Section */
+        .faq-section {
+            margin-bottom: 50px;
+        }
+
+        .faq-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .faq-item {
+            margin-bottom: 20px;
+        }
+
+        .faq-question {
+            font-size: 18px;
+            font-weight: 500;
+            color: #123B57;
+            cursor: pointer;
+        }
+
+        .faq-answer {
+            margin-top: 10px;
+            font-size: 16px;
+            color: #555;
+            display: none; /* Hide by default */
+        }
+
+        .faq-item.active .faq-answer {
+            display: block; /* Show on click */
+        }
+
+        /* Contact Form Section */
+        .contact-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            text-align: left;
+        }
+
+        .form-section {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            font-size: 16px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 14px;
+            font-size: 16px;
+            border: 2px solid #D9D9D9;
+            border-radius: 8px;
+            background-color: #F5F5F5;
+            color: #333;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #123B57;
+            background-color: #fff;
+        }
+
+        .submit-button {
+            padding: 15px 30px;
+            background-color: #123B57;
+            color: white;
+            font-size: 20px;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: 200px;
+            margin-top: 20px;
+            align-self: center;
+        }
+
+        .submit-button:hover {
+            background-color: #2A4F74;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .submit-button {
+                width: 100%;
+            }
+        }
+
+        /* Rating Section */
+        .rating-section {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .rating-label {
+            font-size: 16px;
+            font-weight: 500;
+            color: #333;
+            margin-right: 20px;
+        }
+
+        .rating-input {
+            display: flex;
+            gap: 10px;
+            direction: rtl;
+        }
+
+        .rating-input input[type="radio"] {
+            display: none;
+        }
+
+        .rating-input label {
+            cursor: pointer;
+            font-size: 24px;
+            color: #D9D9D9;
+            transition: color 0.3s ease;
+        }
+
+        .rating-input input[type="radio"]:checked ~ label,
+        .rating-input input[type="radio"]:checked ~ label ~ label {
+            color: #FF9800;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!--<div class="help-title">How Can We Help You?</div> -->
+
+    <!-- FAQ Section -->
+    <!--<div class="faq-section">
+        <div class="faq-title">Frequently Asked Questions</div>
+        <div class="faq-item">
+            <div class="faq-question">1. How do I create a profile?</div>
+            <div class="faq-answer">To create a profile, go to the registration page and fill in the required details, including your name, age, and preferences.</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-question">2. How can I update my dietary preferences?</div>
+            <div class="faq-answer">Log in to your account, navigate to the profile section, and update your preferences from there.</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-question">3. Who can I contact for support?</div>
+            <div class="faq-answer">You can use the contact form below to reach out to our support team for assistance.</div>
+        </div>
+    </div>
+-->
+    <!-- Contact Form Section -->
+    <div class="contact-form">
+        <div class="contact-title">Contact Us</div>
+        <form method="POST" action="{% url 'contact_us' %}">
+            {% csrf_token %}
+            <div class="form-section">
+                <div class="form-label">Your Name:</div>
+                <input type="text" name="name" class="input-field" placeholder="Enter your name" required>
+            </div>
+            <div class="form-section">
+                <div class="form-label">Your Email:</div>
+                <input type="email" name="email" class="input-field" placeholder="Enter your email" required>
+            </div>
+            <div class="form-section">
+                <div class="form-label">Your Message:</div>
+                <textarea name="message" class="input-field" rows="5" placeholder="Type your message here" required></textarea>
+            </div>
+            <div class="form-section rating-section">
+                <div class="rating-label">Your Rating:</div>
+                <div class="rating-input">
+                    <input type="radio" id="rating5" name="rating" value="5" required>
+                    <label for="rating5">&#9733;</label>
+                    <input type="radio" id="rating4" name="rating" value="4">
+                    <label for="rating4">&#9733;</label>
+                    <input type="radio" id="rating3" name="rating" value="3">
+                    <label for="rating3">&#9733;</label>
+                    <input type="radio" id="rating2" name="rating" value="2">
+                    <label for="rating2">&#9733;</label>
+                    <input type="radio" id="rating1" name="rating" value="1">
+                    <label for="rating1">&#9733;</label>
+                </div>
+            </div>
+            <div class="form-section" style="text-align: center;">
+                <button type="submit" class="submit-button">Submit</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Toggle FAQ answers
+    document.querySelectorAll('.faq-question').forEach(question => {
+        question.addEventListener('click', () => {
+            const faqItem = question.parentElement;
+            faqItem.classList.toggle('active');
+        });
+    });
+</script>
+
+</body>
+</html>

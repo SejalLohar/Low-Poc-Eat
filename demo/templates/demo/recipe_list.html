@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipe Explorer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2C3E50;
+            --secondary-color: #3498DB;
+            --background-light: #F7F9FC;
+            --text-color: #333;
+            --card-shadow: 0 10px 20px rgba(0,0,0,0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'time new roman', serif;
+        }
+
+        body {
+            
+            background-color: #FFF1DB;
+            line-height: 1.6;
+            color: var(--text-color);
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: white;
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--background-light);
+            padding-bottom: 1rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            font-weight: 700;
+        }
+
+        .filters {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .filters select, .filters input {
+            padding: 0.75rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background-color: white;
+            transition: all 0.3s ease;
+        }
+
+        .filters select:focus, .filters input:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .meal-type-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            ;
+        }
+
+        .meal-type-buttons button {
+            text-transform:uppercase;
+            padding: 0.75rem 1.5rem;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s;
+        }
+
+        .meal-type-buttons button:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-3px);
+        }
+
+        .meal-type-buttons button.active {
+            background-color: var(--secondary-color);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .recipe-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .recipe-item {
+            background-color: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .recipe-item:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        }
+
+        .recipe-item a {
+            text-decoration: none;
+            color: var(--primary-color);
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        @media screen and (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .filters {
+                justify-content: center;
+            }
+
+            .meal-type-buttons {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .meal-type-buttons button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Recipe Explorer</h1>
+            <div class="filters">
+                <select id="diet-filter">
+                    <option value="">Diet</option>
+                    <option value="vegan">Vegan</option>
+                    <option value="vegetarian">Vegetarian</option>
+                    <option value="non-vegetarian">Non-Vegetarian</option>
+                </select>
+                <select id="health-condition-filter">
+                    <option value="">Health Conditions</option>
+                    <!-- Django template will populate this -->
+                    {% for condition in health_conditions %}
+                        <option value="{{ condition.name }}">{{ condition.name }}</option>
+                    {% endfor %}
+                </select>
+                <input type="range" id="budget-slider" min="0" max="100" step="10">
+                <span id="budget-value">Budget: $1000</span>
+            </div>
+        </div>
+
+        <div class="meal-type-buttons">
+            <button onclick="filterMeals('Breakfast')">Breakfast</button>
+            <button onclick="filterMeals('Lunch')">Lunch</button>
+            <button onclick="filterMeals('Dinner')">Dinner</button>
+        </div>
+
+        <div class="recipe-list" id="recipe-list">
+            {% for meal in meals %}
+                <div class="recipe-item" 
+                     data-meal-type="{{ meal.meal_type }}" 
+                     data-diet="{{ meal.diet_suitability }}" 
+                     data-health-condition="{{ meal.health_condition_suitability.all|join:',' }}" 
+                     data-cost="{{ meal.total_cost }}">
+                    <a href="{% url 'recipe_detail' meal.id %}">{{ meal.name }}</a>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+        // The filtering logic remains the same as in the previous implementation
+        function applyFilters() {
+            const dietFilter = document.getElementById('diet-filter').value.toLowerCase();
+            const healthConditionFilter = document.getElementById('health-condition-filter').value.toLowerCase();
+            const budgetValue = document.getElementById('budget-slider').value;
+            const recipes = document.querySelectorAll('.recipe-item');
+            const budgetValueDisplay = document.getElementById('budget-value');
+            budgetValueDisplay.textContent = `Budget: ₹${budgetValue}`;
+
+            const selectedMealTypeButton = document.querySelector('.meal-type-buttons button.active');
+            const mealTypeFilter = selectedMealTypeButton ? selectedMealTypeButton.textContent : '';
+
+            recipes.forEach(recipe => {
+                const dietSuitability = recipe.getAttribute('data-diet').toLowerCase();
+                const healthConditions = recipe.getAttribute('data-health-condition').toLowerCase().split(',');
+                const cost = parseFloat(recipe.getAttribute('data-cost'));
+                const recipeMealType = recipe.getAttribute('data-meal-type').toLowerCase();
+
+                const dietMatch = dietFilter === '' || dietSuitability === dietFilter;
+                const healthConditionMatch = healthConditionFilter === '' || healthConditions.includes(healthConditionFilter);
+                const budgetMatch = cost <= budgetValue;
+                const mealTypeMatch = mealTypeFilter === '' || recipeMealType === mealTypeFilter.toLowerCase();
+
+                if (dietMatch && healthConditionMatch && budgetMatch && mealTypeMatch) {
+                    recipe.style.display = 'block';
+                } else {
+                    recipe.style.display = 'none';
+                }
+            });
+        }
+
+        function filterMeals(mealType) {
+            const buttons = document.querySelectorAll('.meal-type-buttons button');
+            buttons.forEach(button => button.classList.remove('active'));
+            event.target.classList.add('active');
+            applyFilters();
+        }
+
+        // Add event listeners
+        document.getElementById('diet-filter').addEventListener('change', applyFilters);
+        document.getElementById('health-condition-filter').addEventListener('change', applyFilters);
+        document.getElementById('budget-slider').addEventListener('input', applyFilters);
+
+        // Initialize
+        applyFilters();
+    </script>
+</body>
+</html>

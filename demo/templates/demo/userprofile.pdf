@@ -1,0 +1,281 @@
+<!--
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile Creation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --gradient-primary: linear-gradient(135deg, #6A11CB 0%, #2575FC 100%);
+            --gradient-secondary: linear-gradient(135deg, #FF6B6B 0%, #4ECDC4 100%);
+            --background-color: #F4F7FA;
+            --card-background: #FFFFFF;
+            --text-primary: #2C3E50;
+            --text-secondary: #34495E;
+            --accent-color: #3498DB;
+            --border-radius: 15px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--background-color);
+            line-height: 1.6;
+            color: var(--text-primary);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-image:
+                linear-gradient(
+                    rgba(255,255,255,0.9),
+                    rgba(255,255,255,0.9)
+                ),
+                url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.1'%3E%3Cpath d='M50 50c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c0 5.523-4.477 10-10 10s-10-4.477-10-10 4.477-10 10-10zM10 10c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c0 5.523-4.477 10-10 10S0 25.523 0 20s4.477-10 10-10zm10 8c4.418 0 8-3.582 8-8s-3.582-8-8-8-8 3.582-8 8 3.582 8 8 8zm40 40c4.418 0 8-3.582 8-8s-3.582-8-8-8-8 3.582-8 8 3.582 8 8 8z'/%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: var(--card-background);
+            border-radius: 25px;
+            box-shadow:
+                0 15px 35px rgba(0,0,0,0.1),
+                0 5px 15px rgba(0,0,0,0.05);
+            padding: 50px;
+            position: relative;
+            overflow: hidden;
+            transform: perspective(1000px) rotateX(-10deg) scale(0.9);
+            opacity: 0;
+            animation: fadeInScale 0.8s forwards ease-out;
+        }
+
+        @keyframes fadeInScale {
+            to {
+                transform: perspective(1000px) rotateX(0) scale(1);
+                opacity: 1;
+            }
+        }
+
+        .form-title {
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+            font-size: 40px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 40px;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            position: relative;
+        }
+
+        .form-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 5px;
+            background: var(--gradient-primary);
+            border-radius: 5px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .form-section {
+            flex: 1;
+            position: relative;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            transition: color 0.3s ease;
+        }
+
+        .input-field,
+        .dropdown-input,
+        .select-box {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid transparent;
+            border-radius: var(--border-radius);
+            background: linear-gradient(white, white) padding-box,
+                        var(--gradient-secondary) border-box;
+            background-origin: padding-box, border-box;
+            transition: all 0.4s ease;
+            font-size: 16px;
+        }
+
+        .input-field:focus,
+        .dropdown-input:focus,
+        .select-box:focus {
+            outline: none;
+            box-shadow: 0 10px 20px rgba(37, 117, 252, 0.15);
+            transform: translateY(-3px);
+        }
+
+        .submit-button {
+            display: block;
+            width: 100%;
+            max-width: 350px;
+            margin: 40px auto 0;
+            padding: 18px;
+            background: var(--gradient-primary);
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .submit-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(120deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: all 0.4s ease;
+            z-index: -1;
+        }
+
+        .submit-button:hover::before {
+            left: 100%;
+        }
+
+        .submit-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(37, 117, 252, 0.3);
+        }
+
+        .select-box {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%233498DB' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 24px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 20px;
+                padding: 30px;
+                width: calc(100% - 40px);
+            }
+
+            .form-row {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .form-title {
+                font-size: 32px;
+            }
+        }
+
+        /* Decorative Elements */
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(
+                circle at center,
+                rgba(37, 117, 252, 0.1) 0%,
+                transparent 70%
+            );
+            z-index: -1;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="form-title">Create Your Profile</div>
+
+    <form method="POST" action="{% url 'user_profile' %}">
+        {% csrf_token %}
+-->
+       
+        <!-- Name and Age Section -->
+        <div class="form-row">
+            <div class="form-section">
+                <label class="form-label" for="id_name">Name</label>
+                {{ form.name }}
+            </div>
+
+            <div class="form-section">
+                <label class="form-label" for="id_age">Age</label>
+                {{ form.age }}
+            </div>
+        </div>
+
+        <!-- Height and Weight Section -->
+        <div class="form-row">
+            <div class="form-section">
+                <label class="form-label" for="id_height">Height (in cm)</label>
+                {{ form.height }}
+            </div>
+
+            <div class="form-section">
+                <label class="form-label" for="id_weight">Weight (in kg)</label>
+                {{ form.weight }}
+            </div>
+        </div>
+
+        <!-- Diet Preference Section -->
+        <div class="form-row">
+            <div class="form-section">
+                <label class="form-label" for="id_diet_pref">Diet Preference</label>
+                {{ form.diet_pref }}
+            </div>
+        </div>
+
+        <!-- Food Allergies Section -->
+        <div class="form-row">
+            <div class="form-section">
+                <label class="form-label" for="id_food_allergies">Food Allergies</label>
+                {{ form.food_allergies }}
+            </div>
+        </div>
+
+        <!-- Health Conditions Section -->
+        <div class="form-row">
+            <div class="form-section">
+                <label class="form-label" for="id_health_con">Health Conditions</label>
+                {{ form.health_con }}
+            </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="submit-button">Create Profile</button>
+    </form>
+</div>
+</body>
+</html> 

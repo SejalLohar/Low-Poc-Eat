@@ -1,0 +1,204 @@
+
+<!DOCTYPE html> 
+<html lang="en"> 
+<head> 
+  <meta charset="UTF-8"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+  <title>Login Page</title> 
+  <style> 
+    /* Styles remain the same as before */ 
+   
+    .container { 
+      width: 100%; 
+      height: 100vh; 
+      display: flex; 
+      flex-direction: column; 
+      justify-content: center; 
+      align-items: center; 
+      background: #FFF1DB; 
+      padding: 20px;   
+      text-transform:uppercase;
+    } 
+ 
+    .login-title { 
+      font-size: 38px; 
+      font-weight: 600; 
+      color: black; 
+      margin-bottom: 40px; 
+      text-align:center;
+    } 
+ 
+    .form-container { 
+      width: 100%; 
+      max-width: 500px; 
+      background: #D4BDAC; 
+      padding: 30px; 
+      border-radius: 8px; 
+      box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.5); 
+      font-family: 'time new roman', serif; 
+    } 
+ 
+    .input-field { 
+      width: 100%; 
+      padding: 15px; 
+      margin: 10px 0; 
+      background-color: #D9D9D9; 
+      border: 1px solid #ccc; 
+      border-radius: 8px; 
+      font-size: 16px; 
+      box-sizing: border-box; 
+    } 
+ 
+    .input-label { 
+      font-size: 18px; 
+      font-family: 'Inter', sans-serif; 
+      font-weight: 500; 
+      color: black; 
+      margin-bottom: 8px; 
+    } 
+ 
+    .login-button { 
+      width: 100%; 
+      padding: 16px; 
+      background:black;
+      color: white; 
+      font-size: 18px; 
+      font-family: 'Inter', sans-serif; 
+      font-weight: 500; 
+      text-align: center; 
+      border: none; 
+      border-radius: 8px; 
+      cursor: pointer; 
+      margin-top: 20px; 
+    } 
+ 
+    .login-button:hover { 
+      background: #333; 
+    } 
+ 
+    .forgot-password { 
+      font-size: 16px; 
+      font-family: 'Inter', sans-serif; 
+      font-weight: 500; 
+      color: black; 
+      text-align: center; 
+      margin-top: 15px; 
+    } 
+ 
+    .forgot-password a { 
+      text-decoration: none; 
+      color: black; 
+    } 
+ 
+    .forgot-password a:hover { 
+      text-decoration: underline; 
+    } 
+ 
+    .signup-button { 
+      width: 100%; 
+      padding: 16px; 
+      background: #E6E6E6; 
+      color: black; 
+      font-size: 18px; 
+      font-family: 'Inter', sans-serif; 
+      font-weight: 500; 
+      text-align: center; 
+      border: none; 
+      border-radius: 8px; 
+      cursor: pointer; 
+      margin-top: 10px; 
+    } 
+ 
+    .signup-button:hover { 
+      background: #ccc; 
+    } 
+ 
+    .messages { 
+      width: 100%; 
+      margin-bottom: 20px; 
+      text-align: center; 
+    } 
+ 
+    .message { 
+      padding: 10px; 
+      border-radius: 5px; 
+      margin-bottom: 10px; 
+      font-size: 16px; 
+    } 
+ 
+    .error { 
+      background-color: #f8d7da; 
+      color: #721c24; 
+    } 
+ 
+    .success { 
+      background-color: #d4edda; 
+      color: #155724; 
+    } 
+  </style> 
+</head> 
+<body> 
+<div class="container"> 
+    <!-- Login Title --> 
+     
+ 
+    <!-- Displaying messages (error/success) --> 
+    {% if messages %} 
+      <div class="messages"> 
+        {% for message in messages %} 
+          <div class="message {{ message.tags }}"> 
+            {{ message }} 
+          </div> 
+        {% endfor %} 
+      </div> 
+    {% endif %} 
+ 
+    <!-- Form Container --> 
+    <div class="form-container"> 
+      <div class="login-title">Login</div>
+      <form method="post" onsubmit="return validateLoginForm()"> 
+        {% csrf_token %} 
+        <label for="username" class="input-label">Username:</label> 
+        <input type="text" name="username" id="username" class="input-field" placeholder="Enter your username" required> 
+ 
+        <label for="password" class="input-label">Password:</label> 
+        <input type="password" name="password" id="password" class="input-field" placeholder="Enter your password" required> 
+ 
+        <button type="submit" class="login-button">Log in</button> 
+      </form> 
+ 
+      <!-- Forgot Password Link --> 
+      <div class="forgot-password"> 
+        <a href="#">Forgot Password?</a> 
+      </div> 
+ 
+      <!-- Sign Up Button --> 
+      <button class="signup-button" onclick="window.location.href='{% url 'signup' %}'">Don't have an account? Sign up</button>
+    </div> 
+  </div> 
+ 
+  <script> 
+    // Client-side validation function for the login form 
+    function validateLoginForm() { 
+      var username = document.getElementById('username').value; 
+      var password = document.getElementById('password').value; 
+ 
+      // Check if username and password fields are not empty 
+      if (username.trim() === "" || password.trim() === "") { 
+        alert("Both username and password are required."); 
+        return false; 
+      } 
+ 
+      // Additional validation (optional) 
+      // For example, if you want to ensure the username doesn't contain spaces 
+      if (/\s/.test(username)) { 
+        alert("Username should not contain spaces."); 
+        return false; 
+      } 
+ 
+      // If all validations pass, return true to submit the form 
+      return true; 
+    } 
+  </script> 
+</body> 
+</html>
