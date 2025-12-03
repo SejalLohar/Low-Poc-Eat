@@ -39,7 +39,7 @@ spec:
 
   - name: kubectl
     image: bitnami/kubectl:latest
-    command: ["sh", "-c", "while true; do sleep 30; done"]
+    command: ["cat"]
     tty: true
     volumeMounts:
     - name: workspace-volume
@@ -130,33 +130,49 @@ spec:
         }
 
         stage('Deploy MySQL Database') {
-            steps {
-                container('kubectl') {
-                    sh """
-                        echo '📌 Deploying MySQL first...'
-                        kubectl apply -f k8s/mysql-secret.yaml -n ${NAMESPACE}
-                        kubectl apply -f k8s/mysql-deployment.yaml -n ${NAMESPACE}
-                        kubectl apply -f k8s/mysql-service.yaml -n ${NAMESPACE}
-                        kubectl rollout status deployment/mysql -n ${NAMESPACE} --timeout=120s || true
-                    """
-                }
-            }
-        }
+  steps {
+    container('kubectl') {
+      sh """
+        echo '📌 Deploying MySQL with persistent storage...'
+        kubectl apply -f k8s/mysql-pvc.yaml -n ${NAMESPACE}
+        kubectl apply -f k8s/mysql-deployment.yaml -n ${NAMESPACE}
+        kubectl apply -f k8s/mysql-service.yaml -n ${NAMESPACE}
 
-        stage('Deploy Application') {
-            steps {
-                container('kubectl') {
-                    sh """
-                        echo '🚀 Deploying Application...'
-                        kubectl apply -f k8s/deployment.yaml -n ${NAMESPACE}
-                        kubectl apply -f k8s/service.yaml -n ${NAMESPACE}
-                        kubectl rollout status deployment/lowpoceat-app -n ${NAMESPACE} --timeout=120s || true
-                    """
-                }
-            }
-        }
+        echo '⏳ Waiting for MySQL pod...'
+        kubectl rollout status deployment/mysql -n ${NAMESPACE} --timeout=180s || true
+      """
+    }
+  }
+}
 
-    }  // ← Correctly closing `stages`
+stage('Deploy Application') {
+  steps {
+    container('kubectl') {
+      sh """
+        echo '🚀 Deploying LowPoCEat...'
+        kubectl apply -f k8s/deployment.yaml -n ${NAMESPACE}
+        kubectl apply -f k8s/service.yaml -n ${NAMESPACE}
+
+        kubectl rollout status deployment/lowpoceat-app -n ${NAMESPACE} --timeout=180s || true
+      """
+    }
+  }
+}
+
+stage('Check App Logs') {
+    steps {
+        container('kubectl') {
+            sh """
+                echo '📌 Checking running pods...'
+                kubectl get pods -n ${NAMESPACE}
+
+                echo '🔍 Fetching logs from LowPoCEat App...'
+                kubectl logs -l app=lowpoceat -n ${NAMESPACE} --tail=100
+            """
+        }
+    }
+}
+
 
     post {
         success { echo "🎉 Pipeline completed successfully!" }

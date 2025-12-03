@@ -26,11 +26,13 @@ spec:
         - name: DB_NAME
           value: lowpoceatdb
         - name: DB_USER
+          value: root
           valueFrom:
             secretKeyRef:
               name: mysql-secret
               key: username
         - name: DB_PASSWORD
+          value: root123
           valueFrom:
             secretKeyRef:
               name: mysql-secret
