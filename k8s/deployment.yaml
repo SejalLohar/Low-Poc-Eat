@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lowpoceat-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lowpoceat
+  template:
+    metadata:
+      labels:
+        app: lowpoceat
+    spec:
+      containers:
+        - name: lowpoceat-app
+          image: nexus.imcc.com/lowpoceat:latest
+          ports:
+            - containerPort: 8000
+          env:
+            - name: DB_HOST
+              value: mysql
+            - name: DB_NAME
+              value: lowpoceatdb
+            - name: DB_USER
+              value: root
+            - name: DB_PASSWORD
+              value: root123
