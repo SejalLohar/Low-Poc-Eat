@@ -40,7 +40,7 @@ spec:
 
   - name: kubectl
     image: bitnami/kubectl:latest
-    command: ["cat"]
+    command: ["sh", "-c", "sleep infinity"]
     tty: true
     volumeMounts:
     - name: workspace-volume
