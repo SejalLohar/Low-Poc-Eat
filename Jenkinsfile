@@ -12,7 +12,6 @@ apiVersion: v1
 kind: Pod
 spec:
   containers:
-
   - name: dind
     image: docker:dind
     securityContext:
@@ -78,34 +77,14 @@ spec:
                 container('dind') {
                     sh """
                         echo '🔧 Waiting for Docker daemon...'
-                        # Wait until Docker daemon inside dind is ready
                         until docker info >/dev/null 2>&1; do
-                          echo 'Docker is not ready yet, sleeping 5s...'
+                          echo 'Docker not ready, waiting 5s...'
                           sleep 5
                         done
-
-                        echo '🐳 Docker is ready. Building image...'
+                        echo '🐳 Docker ready! Building image...'
                         docker build -t ${DOCKER_IMAGE}:${BUILD_NUMBER} -t ${DOCKER_IMAGE}:latest .
                         docker image ls
                     """
-                }
-            }
-        }
-
-        stage('Run Tests & Coverage') {
-            steps {
-                container('dind') {
-                    echo "⚠ Skipping pytest step for now (no tests configured in image)."
-                    // If you later add tests, replace this echo with pytest + coverage
-                    /*
-                    sh """
-                        docker run --rm \
-                        -v $PWD:/workspace \
-                        -w /workspace \
-                        ${DOCKER_IMAGE}:latest \
-                        pytest --maxfail=1 --disable-warnings --cov=. --cov-report=xml
-                    """
-                    */
                 }
             }
         }
@@ -129,7 +108,7 @@ spec:
             steps {
                 container('dind') {
                     sh """
-                        echo '🔐 Logging into Nexus registry...'
+                        echo '🔐 Logging into Nexus...'
                         docker login ${REGISTRY_HOST} -u admin -p Changeme@2025
                     """
                 }
@@ -143,32 +122,44 @@ spec:
                         echo '⬆ Pushing image to Nexus...'
                         docker tag ${DOCKER_IMAGE}:${BUILD_NUMBER} ${REGISTRY}/${DOCKER_IMAGE}:${BUILD_NUMBER}
                         docker tag ${DOCKER_IMAGE}:${BUILD_NUMBER} ${REGISTRY}/${DOCKER_IMAGE}:latest
-
                         docker push ${REGISTRY}/${DOCKER_IMAGE}:${BUILD_NUMBER}
                         docker push ${REGISTRY}/${DOCKER_IMAGE}:latest
-
-                        docker pull ${REGISTRY}/${DOCKER_IMAGE}:${BUILD_NUMBER}
-                        docker image ls
                     """
                 }
             }
         }
 
-        stage('Deploy to Kubernetes') {
+        stage('Deploy MySQL Database') {
             steps {
                 container('kubectl') {
                     sh """
-                        echo '🚀 Applying Kubernetes manifests...'
-                        kubectl apply -f k8s/deployment.yaml -n ${NAMESPACE}
-                        kubectl apply -f k8s/service.yaml -n ${NAMESPACE}
+                        echo '📌 Deploying MySQL first...'
+                        kubectl apply -f k8s/mysql-secret.yaml -n ${NAMESPACE}
+                        kubectl apply -f k8s/mysql-deployment.yaml -n ${NAMESPACE}
+                        kubectl apply -f k8s/mysql-service.yaml -n ${NAMESPACE}
+                        kubectl rollout status deployment/mysql -n ${NAMESPACE} --timeout=120s || true
                     """
                 }
             }
         }
-    }
+
+        stage('Deploy Application') {
+            steps {
+                container('kubectl') {
+                    sh """
+                        echo '🚀 Deploying Application...'
+                        kubectl apply -f k8s/deployment.yaml -n ${NAMESPACE}
+                        kubectl apply -f k8s/service.yaml -n ${NAMESPACE}
+                        kubectl rollout status deployment/lowpoceat-app -n ${NAMESPACE} --timeout=120s || true
+                    """
+                }
+            }
+        }
+
+    }  // ← Correctly closing `stages`
 
     post {
-        success { echo "🎉 LowPocEat CI/CD Pipeline completed successfully!" }
+        success { echo "🎉 Pipeline completed successfully!" }
         failure { echo "❌ Pipeline failed" }
         always  { echo "🔄 Pipeline finished" }
     }
