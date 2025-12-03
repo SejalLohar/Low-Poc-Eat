@@ -1,0 +1,6 @@
+projectKey=Low-Poc-Eat
+serverUrl=http://sonarqube.imcc.com
+serverVersion=25.1.0.102122
+dashboardUrl=http://sonarqube.imcc.com/dashboard?id=Low-Poc-Eat
+ceTaskId=002ede41-47a5-44d1-a504-750cff94872c
+ceTaskUrl=http://sonarqube.imcc.com/api/ce/task?id=002ede41-47a5-44d1-a504-750cff94872c
