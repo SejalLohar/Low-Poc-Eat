@@ -2,6 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: lowpoceat-app
+  labels:
+    app: lowpoceat
 spec:
   replicas: 1
   selector:
@@ -13,16 +15,24 @@ spec:
         app: lowpoceat
     spec:
       containers:
-        - name: lowpoceat-app
-          image: nexus.imcc.com/lowpoceat:latest
-          ports:
-            - containerPort: 8000
-          env:
-            - name: DB_HOST
-              value: mysql
-            - name: DB_NAME
-              value: lowpoceatdb
-            - name: DB_USER
-              value: root
-            - name: DB_PASSWORD
-              value: root123
+      - name: lowpoceat-app
+        image: nexus-service-for-docker-hosted-registry.nexus.svc.cluster.local:8085/2401116/lowpoceat:latest
+        ports:
+        - containerPort: 8000
+        env:
+        - name: DB_HOST
+          value: mysql-service
+        - name: DB_NAME
+          value: lowpoceatdb
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secret
+              key: username
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secret
+              key: password
+        command: ["/bin/sh"]
+        args: ["-c", "gunicorn DjangoProject2.wsgi:application --bind 0.0.0.0:8000"]

@@ -24,6 +24,8 @@ spec:
     env:
     - name: DOCKER_TLS_CERTDIR
       value: ""
+    - name: DOCKER_HOST
+      value: "tcp://localhost:2375"
     volumeMounts:
     - name: workspace-volume
       mountPath: /home/jenkins/agent
@@ -75,6 +77,7 @@ spec:
             steps {
                 container('dind') {
                     sh """
+                        docker version
                         docker build -t ${DOCKER_IMAGE}:${BUILD_NUMBER} -t ${DOCKER_IMAGE}:latest .
                         docker image ls
                     """
