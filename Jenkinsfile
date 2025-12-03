@@ -68,7 +68,7 @@ spec:
             steps {
                 deleteDir()
                 sh "git clone https://github.com/SejalLohar/Low-Poc-Eat.git ."
-                echo '✔ Source code cloned successfully'
+                echo "✔ Source code cloned successfully"
             }
         }
 
@@ -78,10 +78,10 @@ spec:
                     sh """
                         echo '🔧 Waiting for Docker daemon...'
                         until docker info >/dev/null 2>&1; do
-                          echo 'Docker not ready, waiting 5s...'
+                          echo 'Docker not ready yet, waiting 5s...'
                           sleep 5
                         done
-                        echo '🐳 Docker ready! Building image...'
+                        echo '🐳 Docker is ready! Building image...'
                         docker build -t ${DOCKER_IMAGE}:${BUILD_NUMBER} -t ${DOCKER_IMAGE}:latest .
                         docker image ls
                     """
@@ -95,3 +95,88 @@ spec:
                     sh """
                         sonar-scanner \
                           -Dsonar.projectKey=Low-Poc-Eat \
+                          -Dsonar.projectName=Low-Poc-Eat \
+                          -Dsonar.host.url=http://my-sonarqube-sonarqube.sonarqube.svc.cluster.local:9000 \
+                          -Dsonar.python.coverage.reportPaths=coverage.xml \
+                          -Dsonar.token=${SONAR_TOKEN}
+                    """
+                }
+            }
+        }
+
+        stage('Login to Nexus') {
+            steps {
+                container('dind') {
+                    sh """
+                        echo '🔐 Logging into Nexus...'
+                        docker login ${REGISTRY_HOST} -u admin -p Changeme@2025
+                    """
+                }
+            }
+        }
+
+        stage('Push Image') {
+            steps {
+                container('dind') {
+                    sh """
+                        echo '⬆ Pushing image to Nexus...'
+                        docker tag ${DOCKER_IMAGE}:${BUILD_NUMBER} ${REGISTRY}/${DOCKER_IMAGE}:${BUILD_NUMBER}
+                        docker tag ${DOCKER_IMAGE}:${BUILD_NUMBER} ${REGISTRY}/${DOCKER_IMAGE}:latest
+                        docker push ${REGISTRY}/${DOCKER_IMAGE}:${BUILD_NUMBER}
+                        docker push ${REGISTRY}/${DOCKER_IMAGE}:latest
+                    """
+                }
+            }
+        }
+
+        stage('Deploy MySQL Database') {
+            steps {
+                container('kubectl') {
+                    sh """
+                        echo '📌 Deploying MySQL with persistent storage...'
+
+                        kubectl apply -f k8s/mysql-pvc.yaml -n ${NAMESPACE}
+                        kubectl apply -f k8s/mysql-deployment.yaml -n ${NAMESPACE}
+                        kubectl apply -f k8s/mysql-service.yaml -n ${NAMESPACE}
+
+                        echo '⏳ Waiting for MySQL to start...'
+                        kubectl rollout status deployment/mysql -n ${NAMESPACE} --timeout=180s || true
+                    """
+                }
+            }
+        }
+
+        stage('Deploy Application') {
+            steps {
+                container('kubectl') {
+                    sh """
+                        echo '🚀 Deploying LowPoCEat App...'
+                        kubectl apply -f k8s/deployment.yaml -n ${NAMESPACE}
+                        kubectl apply -f k8s/service.yaml -n ${NAMESPACE}
+                        kubectl rollout status deployment/lowpoceat-app -n ${NAMESPACE} --timeout=180s || true
+                    """
+                }
+            }
+        }
+
+        stage('Check App Logs') {
+            steps {
+                container('kubectl') {
+                    sh """
+                        echo '📌 Checking running pods...'
+                        kubectl get pods -n ${NAMESPACE}
+                        
+                        echo '🔍 Reading application logs...'
+                        kubectl logs -l app=lowpoceat -n ${NAMESPACE} --tail=100 || true
+                    """
+                }
+            }
+        }
+    }
+
+    post {
+        success { echo "🎉 LowPocEat CI/CD Pipeline completed successfully!" }
+        failure { echo "❌ Pipeline failed — check logs above" }
+        always  { echo "🔄 Pipeline finished" }
+    }
+}
