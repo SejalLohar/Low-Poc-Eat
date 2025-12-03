@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: lowpoceat-app
+  namespace: 2401116
   labels:
     app: lowpoceat
 spec:
@@ -34,5 +35,20 @@ spec:
             secretKeyRef:
               name: mysql-secret
               key: password
+
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8000
+          initialDelaySeconds: 20
+          periodSeconds: 10
+
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 20
+
         command: ["/bin/sh"]
         args: ["-c", "gunicorn DjangoProject2.wsgi:application --bind 0.0.0.0:8000"]
