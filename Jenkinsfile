@@ -38,7 +38,7 @@ spec:
       mountPath: /home/jenkins/agent
 
   - name: kubectl
-    image: lachlanevenson/k8s-kubectl:v1.26.0
+    image: 'bitnami/kubectl:latest'
     command: ["cat"]
     tty: true
     volumeMounts:
