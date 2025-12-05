@@ -22,17 +22,17 @@ spec:
         - containerPort: 8000
         env:
         - name: DB_HOST
-          value: mysql-service
+          value: "my-mysql.mysql.svc.cluster.local"
+        - name: DB_PORT
+          value: "3306"
         - name: DB_NAME
-          value: lowpoceatdb
+          value: "lowpoceat"
         - name: DB_USER
-          value: root
           valueFrom:
             secretKeyRef:
               name: mysql-secret
               key: username
         - name: DB_PASSWORD
-          value: root123
           valueFrom:
             secretKeyRef:
               name: mysql-secret
