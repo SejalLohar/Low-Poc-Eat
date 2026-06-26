@@ -102,10 +102,10 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
-EMAIL_HOST_USER = 'sejzzu.lohar@gmail.com'
-EMAIL_HOST_PASSWORD = 'eeikqjbckokwarbc'
+EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = ''
 
-DEFAULT_FROM_EMAIL = 'LowPoCEat App <no-reply@lowpoceat.com>'
+DEFAULT_FROM_EMAIL = ''
 
 
 # Login redirects
